@@ -1,7 +1,7 @@
 #include "../default_notifier.h"
 #include "../../io_helper.h"
 
-namespace magneto {
+namespace xforce {
 
 DefaultNotifier::DefaultNotifier() :
   pthread_key_(0),
@@ -15,7 +15,7 @@ bool DefaultNotifier::Init() {
   fd_epoll_ = epoll_create(100);
   if (fd_epoll_<=0) return false;
 
-  MAG_NEW(epoll_events_, epoll_event [kMaxEpollEvents])
+  XFC_NEW(epoll_events_, epoll_event [kMaxEpollEvents])
   return true;
 }
 
@@ -72,7 +72,7 @@ int DefaultNotifier::Wait(time_t timeout_ms) {
 }
 
 DefaultNotifier::~DefaultNotifier() {
-  MAG_DELETE_ARRAY(epoll_events_)
+  XFC_DELETE_ARRAY(epoll_events_)
   if (0!=fd_epoll_) close(fd_epoll_);
   if (0!=pthread_key_) pthread_key_delete(pthread_key_);
 }

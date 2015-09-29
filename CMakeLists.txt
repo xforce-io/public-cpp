@@ -37,10 +37,18 @@ add_custom_command(TARGET public-cpp
   COMMAND ${CMAKE_COMMAND} -E make_directory ${PUBLIC_CPP_OUTPUT_PATH} 
   COMMAND ${CMAKE_COMMAND} -E make_directory ${PUBLIC_CPP_LIB_OUTPUT_PATH} 
   COMMAND ${CMAKE_COMMAND} -E make_directory ${PUBLIC_CPP_INC_OUTPUT_PATH} 
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${PUBLIC_CPP_INC_OUTPUT_PATH}/jsontype
   COMMAND ${CMAKE_COMMAND} -E make_directory ${PUBLIC_CPP_INC_OUTPUT_PATH}/mpsc_fixed_pipe
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${PUBLIC_CPP_INC_OUTPUT_PATH}/pool_objs
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${PUBLIC_CPP_INC_OUTPUT_PATH}/thread_privacy
 
-  COMMAND ${CMAKE_COMMAND} -E copy ${PUBLIC_CPP_SRC_DIR}/mpsc_fixed_pipe/mpsc_fixed_pipe.hpp ${PUBLIC_CPP_INC_OUTPUT_PATH}/mpsc_fixed_pipe/
+  COMMAND ${CMAKE_COMMAND} -E copy ${PUBLIC_CPP_SRC_DIR}/io_helper.h ${PUBLIC_CPP_INC_OUTPUT_PATH}/
+  COMMAND ${CMAKE_COMMAND} -E copy ${PUBLIC_CPP_SRC_DIR}/jsontype/jsontype.h ${PUBLIC_CPP_INC_OUTPUT_PATH}/jsontype/
+  COMMAND ${CMAKE_COMMAND} -E copy ${PUBLIC_CPP_SRC_DIR}/lock_policy.hpp ${PUBLIC_CPP_INC_OUTPUT_PATH}/
   COMMAND ${CMAKE_COMMAND} -E copy ${PUBLIC_CPP_SRC_DIR}/mpsc_fixed_pipe/default_notifier.h ${PUBLIC_CPP_INC_OUTPUT_PATH}/mpsc_fixed_pipe/
+  COMMAND ${CMAKE_COMMAND} -E copy ${PUBLIC_CPP_SRC_DIR}/mpsc_fixed_pipe/mpsc_fixed_pipe.hpp ${PUBLIC_CPP_INC_OUTPUT_PATH}/mpsc_fixed_pipe/
+  COMMAND ${CMAKE_COMMAND} -E copy ${PUBLIC_CPP_SRC_DIR}/pool_objs/pool_objs.hpp ${PUBLIC_CPP_INC_OUTPUT_PATH}/pool_objs/
+  COMMAND ${CMAKE_COMMAND} -E copy ${PUBLIC_CPP_SRC_DIR}/thread_privacy/thread_privacy.h ${PUBLIC_CPP_INC_OUTPUT_PATH}/thread_privacy/
 )
 
 add_custom_command(TARGET public-cpp
