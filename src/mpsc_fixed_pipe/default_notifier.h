@@ -3,7 +3,7 @@
 #include "../common.h"
 #include "../lock_policy.hpp"
 
-namespace magneto {
+namespace xforce {
 
 class DefaultNotifier {
  private:

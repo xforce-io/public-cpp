@@ -3,7 +3,7 @@
 #include "../common.h"
 #include "default_notifier.h"
 
-namespace magneto {
+namespace xforce {
 
 template <typename MsgHeader>
 struct MPSCFixedPipeMsg {
@@ -211,7 +211,7 @@ time_t MPSCFixedPipe<MsgHeader, Notifier>::GetCurrentTimeUs() {
 
 template <typename MsgHeader, typename Notifier>
 MPSCFixedPipe<MsgHeader, Notifier>::~MPSCFixedPipe() {
-  MAG_DELETE_ARRAY(pipe_)
+  XFC_DELETE_ARRAY(pipe_)
 }
 
 template <typename MsgHeader, typename Notifier>
