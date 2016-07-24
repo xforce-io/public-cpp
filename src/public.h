@@ -17,3 +17,5 @@
 #include "thread_privacy/thread_privacy.h"
 #include "thread_private_pool.hpp"
 #include "time/time.h"
+#include "str_helper.hpp"
+#include "multi_array_helper.hpp"

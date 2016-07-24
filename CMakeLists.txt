@@ -62,6 +62,7 @@ add_custom_command(TARGET public-cpp
   COMMAND cp ${PUBLIC_CPP_SRC_DIR}/thread_privacy/thread_privacy.h ${PUBLIC_CPP_INC_OUTPUT_PATH}/thread_privacy/
   COMMAND cp ${PUBLIC_CPP_SRC_DIR}/thread_private_pool.hpp ${PUBLIC_CPP_INC_OUTPUT_PATH}/
   COMMAND cp ${PUBLIC_CPP_SRC_DIR}/time/time.h ${PUBLIC_CPP_INC_OUTPUT_PATH}/time/
+  COMMAND cp ${PUBLIC_CPP_SRC_DIR}/str_helper.hpp ${PUBLIC_CPP_INC_OUTPUT_PATH}/time/
   COMMAND git log | head -n 1 > ${PUBLIC_CPP_OUTPUT_PATH}/version
 )
 
