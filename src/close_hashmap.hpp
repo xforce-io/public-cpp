@@ -61,8 +61,10 @@ class CloseHashmap {
   virtual ~CloseHashmap();
  
  private:
-  inline const Item* GetItem_(const Key& key) const;
-  inline Item* GetItem_(const Key& key);
+  inline const Item* GetItemOrUntouched_(const Key& key) const;
+  inline Item* GetItemOrUntouched_(const Key& key);
+  inline const Item* GetItemOrFree_(const Key& key) const;
+  inline Item* GetItemOrFree_(const Key& key);
 
  private:
   size_t size_array_;
@@ -167,11 +169,10 @@ bool CloseHashmap<Key, Val, KeyEqualF, HashF>::Init(
 template <typename Key, typename Val, typename KeyEqualF, typename HashF>
 bool CloseHashmap<Key, Val, KeyEqualF, HashF>::Insert(const Key& key, const Val& val) {
   if (unlikely(size_array_==num_elm_)) {
-    XFC_BUG(true)
     return false;
   }
 
-  Item* item = GetItem_(key);
+  Item* item = GetItemOrFree_(key);
   if (NULL!=item && item->first<=0) {
     *item = std::make_pair(1, std::make_pair(key, val));
     ++num_elm_;
@@ -183,8 +184,8 @@ bool CloseHashmap<Key, Val, KeyEqualF, HashF>::Insert(const Key& key, const Val&
 
 template <typename Key, typename Val, typename KeyEqualF, typename HashF>
 bool CloseHashmap<Key, Val, KeyEqualF, HashF>::Erase(const Key& key) {
-  Item* item = GetItem_(key);
-  if (NULL!=item && item->first>0 && key_equal_(key, item->second.first)) {
+  Item* item = GetItemOrUntouched_(key);
+  if (NULL!=item && item->first>0) {
     item->first = -1;
     --num_elm_;
     return true;
@@ -195,7 +196,7 @@ bool CloseHashmap<Key, Val, KeyEqualF, HashF>::Erase(const Key& key) {
 
 template <typename Key, typename Val, typename KeyEqualF, typename HashF>
 const Val* CloseHashmap<Key, Val, KeyEqualF, HashF>::Get(const Key& key) const {
-  const Item* item = GetItem_(key);
+  const Item* item = GetItemOrUntouched_(key);
   return NULL!=item && item->first > 0 ? &(item->second.second) : NULL;
 }
 
@@ -206,9 +207,9 @@ Val* CloseHashmap<Key, Val, KeyEqualF, HashF>::Get(const Key& key) {
 
 template <typename Key, typename Val, typename KeyEqualF, typename HashF>
 const typename CloseHashmap<Key, Val, KeyEqualF, HashF>::Item* 
-CloseHashmap<Key, Val, KeyEqualF, HashF>::GetItem_(const Key& key) const {
+CloseHashmap<Key, Val, KeyEqualF, HashF>::GetItemOrUntouched_(const Key& key) const {
   size_t pos = hash_(key) % size_array_;
-  if (!items_[pos].first || key_equal_(key, items_[pos].second.first)) {
+  if (items_[pos].first==0 || key_equal_(key, items_[pos].second.first)) {
     return &(items_[pos]);
   }
 
@@ -219,14 +220,38 @@ CloseHashmap<Key, Val, KeyEqualF, HashF>::GetItem_(const Key& key) const {
       return &(items_[pos]);
     }
   }
-  XFC_BUG(true)
+  return NULL;
+}
+
+template <typename Key, typename Val, typename KeyEqualF, typename HashF>
+const typename CloseHashmap<Key, Val, KeyEqualF, HashF>::Item* 
+CloseHashmap<Key, Val, KeyEqualF, HashF>::GetItemOrFree_(const Key& key) const {
+  const Item* item = GetItemOrUntouched_(key);
+  if (item!=NULL) {
+    return item;
+  }
+
+  size_t pos = hash_(key) % size_array_;
+  const size_t step = kPrimes[pos%kNumPrimes]; 
+  for (size_t i=0; i<size_array_; ++i) {
+    if (items_[pos].first<=0) {
+      return &(items_[pos]);
+    }
+    pos = (pos+step) % size_array_;
+  }
   return NULL;
 }
 
 template <typename Key, typename Val, typename KeyEqualF, typename HashF>
 typename CloseHashmap<Key, Val, KeyEqualF, HashF>::Item* 
-CloseHashmap<Key, Val, KeyEqualF, HashF>::GetItem_(const Key& key) {
-  return CCAST<Item*>(CCAST<const Self*>(this)->GetItem_(key));
+CloseHashmap<Key, Val, KeyEqualF, HashF>::GetItemOrUntouched_(const Key& key) {
+  return CCAST<Item*>(CCAST<const Self*>(this)->GetItemOrUntouched_(key));
+}
+
+template <typename Key, typename Val, typename KeyEqualF, typename HashF>
+typename CloseHashmap<Key, Val, KeyEqualF, HashF>::Item* 
+CloseHashmap<Key, Val, KeyEqualF, HashF>::GetItemOrFree_(const Key& key) {
+  return CCAST<Item*>(CCAST<const Self*>(this)->GetItemOrFree_(key));
 }
 
 template <typename Key, typename Val, typename KeyEqualF, typename HashF>

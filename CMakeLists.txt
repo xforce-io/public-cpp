@@ -4,9 +4,11 @@ project(public-cpp)
 
 include_directories(
   /usr/include/
+  /home/freeman/software/include/
   )
 
 link_directories(
+  /home/freeman/software/lib/
 )
 
 set(PUBLIC_CPP_OUTPUT_PATH public-cpp/)

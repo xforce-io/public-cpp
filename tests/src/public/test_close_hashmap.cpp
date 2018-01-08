@@ -1,12 +1,12 @@
 #include "gtest/gtest.h"
-#include "../../../src/public/close_hashmap.hpp"
-#include "../../../src//public/time/time.h"
+#include "../../../src/close_hashmap.hpp"
+#include "../../../src//time/time.h"
 
-using namespace magneto;
+using namespace xforce;
 
-namespace xforce { namespace magneto {
-LOGGER_IMPL(xforce_logger, "magneto")
-}}
+namespace xforce {
+LOGGER_IMPL(xforce_logger, "xforce")
+}
 
 int main(int argc, char** argv) {
   srand(time(NULL));
@@ -66,7 +66,8 @@ TEST_F(TestCloseHashmap, pressure) {
 
   static const size_t kTimesTest=1;
   static const size_t kRange=10000000;
-  static const size_t kNumElements=10000;
+  static const size_t kCapacity=10000;
+  static const size_t kNumElements = kCapacity;
 
   for (size_t i=0; i<kTimesTest; ++i) {
     srand(i);
@@ -79,11 +80,11 @@ TEST_F(TestCloseHashmap, pressure) {
 
     CmpContainer cmp_container;
     TargetContainer target_container;
-    ASSERT_TRUE(target_container.Init(kNumElements));
+    ASSERT_TRUE(target_container.Init(kCapacity));
 
     Timer t;
     t.Start(true);
-    for (size_t i=0; i<kNumElements; ++i) {
+    for (size_t i=0; i < kNumElements; ++i) {
       if (array_test[i].first) {
         cmp_container.insert(array_test[i].second);
       } else {
@@ -94,7 +95,7 @@ TEST_F(TestCloseHashmap, pressure) {
     std::cout << "unordered_set_cost[" << t.TimeUs() << "]" << std::endl;
 
     t.Start(true);
-    for (size_t i=0; i<kNumElements; ++i) {
+    for (size_t i=0; i < kNumElements; ++i) {
       if (array_test[i].first) {
         target_container.Insert(array_test[i].second, array_test[i].second);
       } else {
@@ -108,10 +109,26 @@ TEST_F(TestCloseHashmap, pressure) {
       for (size_t i=0; i<kNumElements; ++i) {
         std::cout << "[" << array_test[i].first << "|" << array_test[i].second << "]" << std::endl;
       }
-
     }
     ASSERT_EQ(cmp_container.size(), target_container.Size());
 
     delete [] array_test;
   }
 }
+
+TEST_F(TestCloseHashmap, bug) {
+  const size_t kNumItems = 5;
+  Container close_hashmap;
+  ASSERT_TRUE(close_hashmap.Init(kNumItems));
+  for (size_t i=0; i<kNumItems; ++i) {
+    ASSERT_TRUE(close_hashmap.Insert(i, i));
+  }
+  for (size_t i=0; i<kNumItems; ++i) {
+    ASSERT_TRUE(close_hashmap.Erase(i));
+  }
+  for (size_t i=0; i<kNumItems; ++i) {
+    ASSERT_TRUE(close_hashmap.Insert(i+kNumItems, i+kNumItems));
+  }
+}
+
+

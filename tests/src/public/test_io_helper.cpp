@@ -1,11 +1,11 @@
 #include "gtest/gtest.h"
-#include "../../../src/public/io_helper.h"
+#include "../../../src/io_helper.h"
 
-using namespace magneto;
+using namespace xforce;
 
-namespace xforce { namespace magneto {
-LOGGER_IMPL(xforce_logger, "magneto")
-}}
+namespace xforce { 
+LOGGER_IMPL(xforce_logger, "xforce")
+}
 
 int main(int argc, char** argv) {
   srand(time(NULL));
