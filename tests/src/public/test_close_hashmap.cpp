@@ -63,6 +63,17 @@ TEST_F(TestCloseHashmap, case1) {
   ASSERT_TRUE(*(close_hashmap.Get(1)) == 6);
 }
 
+TEST_F(TestCloseHashmap, upsert) {
+  Container close_hashmap;
+  ASSERT_TRUE(close_hashmap.Init(1));
+  ASSERT_TRUE(close_hashmap.Upsert(3,2));
+  ASSERT_TRUE(close_hashmap.Upsert(1,6));
+  ASSERT_TRUE(close_hashmap.Upsert(3,4));
+  ASSERT_TRUE(close_hashmap.Capacity() == 2);
+  ASSERT_TRUE(*(close_hashmap.Get(3)) == 4);
+  ASSERT_TRUE(*(close_hashmap.Get(1)) == 6);
+}
+
 TEST_F(TestCloseHashmap, erase) {
   const size_t kNumItems = 5;
   Container close_hashmap;

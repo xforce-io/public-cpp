@@ -50,6 +50,7 @@ class CloseHashmap {
       HashF hash = HashF());
 
   inline bool Insert(const Key& key, const Val& val);
+  inline bool Upsert(const Key& key, const Val& val);
   inline bool Erase(const Key& key);
   inline void Copy(const Self &from);
 
@@ -185,13 +186,38 @@ bool CloseHashmap<Key, Val, KeyEqualF, HashF>::Insert(const Key& key, const Val&
   }
 
   Item* item = GetItemOrFree_(key);
-  if (item->first<=0) {
+  if (item->first <= 0) {
     *item = std::make_pair(1, std::make_pair(key, val));
     ++num_elm_;
     return true;
   } else {
     return false;
   }
+}
+
+template <typename Key, typename Val, typename KeyEqualF, typename HashF>
+bool CloseHashmap<Key, Val, KeyEqualF, HashF>::Upsert(const Key& key, const Val& val) {
+  Item *item = GetItemOrFree_(key);
+  if (item != NULL && item->first > 0) {
+    *item = std::make_pair(1, std::make_pair(key, val));
+    return true;
+  }
+
+  if (size_array_!=num_elm_) {
+    *item = std::make_pair(1, std::make_pair(key, val));
+    ++num_elm_;
+    return true;
+  } else {
+    if (to_resize_) {
+      Resize();
+      Item* item = GetItemOrFree_(key);
+      *item = std::make_pair(1, std::make_pair(key, val));
+      ++num_elm_;
+      return true;
+    } else {
+      return false;
+    }
+  }  
 }
 
 template <typename Key, typename Val, typename KeyEqualF, typename HashF>
