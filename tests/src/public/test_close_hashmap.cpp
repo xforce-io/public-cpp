@@ -25,7 +25,7 @@ class TestCloseHashmap: public ::testing::Test {
   virtual void TearDown() {}
 };
 
-TEST_F(TestCloseHashmap, positive) {
+TEST_F(TestCloseHashmap, case0) {
   Container close_hashmap;
   ASSERT_TRUE(close_hashmap.Init(100));
 
@@ -53,11 +53,29 @@ TEST_F(TestCloseHashmap, positive) {
   ASSERT_EQ(12, sum);
 }
 
-TEST_F(TestCloseHashmap, negative) {
+TEST_F(TestCloseHashmap, case1) {
   Container close_hashmap;
   ASSERT_TRUE(close_hashmap.Init(1));
   ASSERT_TRUE(close_hashmap.Insert(3,2));
-  ASSERT_TRUE(!close_hashmap.Insert(1,6));
+  ASSERT_TRUE(close_hashmap.Insert(1,6));
+  ASSERT_TRUE(close_hashmap.Capacity() == 2);
+  ASSERT_TRUE(*(close_hashmap.Get(3)) == 2);
+  ASSERT_TRUE(*(close_hashmap.Get(1)) == 6);
+}
+
+TEST_F(TestCloseHashmap, erase) {
+  const size_t kNumItems = 5;
+  Container close_hashmap;
+  ASSERT_TRUE(close_hashmap.Init(kNumItems, false));
+  for (size_t i=0; i<kNumItems; ++i) {
+    ASSERT_TRUE(close_hashmap.Insert(i, i));
+  }
+  for (size_t i=0; i<kNumItems; ++i) {
+    ASSERT_TRUE(close_hashmap.Erase(i));
+  }
+  for (size_t i=0; i<kNumItems; ++i) {
+    ASSERT_TRUE(close_hashmap.Insert(i+kNumItems, i+kNumItems));
+  }
 }
 
 TEST_F(TestCloseHashmap, pressure) {
@@ -65,9 +83,9 @@ TEST_F(TestCloseHashmap, pressure) {
   typedef CloseHashmap<size_t, size_t> TargetContainer;
 
   static const size_t kTimesTest=1;
-  static const size_t kRange=10000000;
+  static const size_t kRange=100000;
   static const size_t kCapacity=10000;
-  static const size_t kNumElements = kCapacity;
+  static const size_t kNumElements = 3*kCapacity;
 
   for (size_t i=0; i<kTimesTest; ++i) {
     srand(i);
@@ -115,20 +133,3 @@ TEST_F(TestCloseHashmap, pressure) {
     delete [] array_test;
   }
 }
-
-TEST_F(TestCloseHashmap, bug) {
-  const size_t kNumItems = 5;
-  Container close_hashmap;
-  ASSERT_TRUE(close_hashmap.Init(kNumItems));
-  for (size_t i=0; i<kNumItems; ++i) {
-    ASSERT_TRUE(close_hashmap.Insert(i, i));
-  }
-  for (size_t i=0; i<kNumItems; ++i) {
-    ASSERT_TRUE(close_hashmap.Erase(i));
-  }
-  for (size_t i=0; i<kNumItems; ++i) {
-    ASSERT_TRUE(close_hashmap.Insert(i+kNumItems, i+kNumItems));
-  }
-}
-
-
