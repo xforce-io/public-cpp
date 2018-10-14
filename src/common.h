@@ -6,6 +6,7 @@
 #include <list>
 #include <tr1/unordered_map>
 #include <tr1/unordered_set>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -37,6 +38,12 @@
 #include <sys/syscall.h>
 
 #include <malloc.h>
+
+/*
+ * boost headers
+ */
+
+#include <boost/multi_array.hpp>
 
 #ifdef MEMPROFILE
 #include "mem_profile.h"
