@@ -3,6 +3,8 @@
 #include <sstream>
 #include "common.h"
 
+namespace xforce {
+
 /*
  * @notice : (1) no pool is used here, libs such as tcmalloc should be used to 
  *           speed up the process of insert and erase
@@ -23,6 +25,7 @@ class SimpleTrie {
   bool Erase(const char* buf, size_t len_buf);
   inline bool Find(const char* buf, size_t len_buf) const;
   inline int HasPrefixOf(const char* buf, size_t len_buf) const;
+  inline void PrefixesOf(const char* buf, size_t len_buf, std::vector<size_t> &offsets) const;
   void Clear();
 
   ~SimpleTrie();
@@ -54,7 +57,9 @@ bool SimpleTrie::Find(const char* buf, size_t len_buf) const {
   size_t len_tmp = len_buf;
   const SimpleTrie* iter_trie = this;
   while ( unlikely(0!=len_tmp) ) {
-    if (true != IterToNextNode_(*buf_tmp, &iter_trie)) return false;
+    if (true != IterToNextNode_(*buf_tmp, &iter_trie)) {
+      return false;
+    }
 
     ++buf_tmp;
     --len_tmp;
@@ -67,8 +72,13 @@ int SimpleTrie::HasPrefixOf(const char* buf, size_t len_buf) const {
   size_t len_tmp = len_buf;
   const SimpleTrie* iter_trie = this;
   for (;;) {
-    if ( unlikely(iter_trie->refcnt_>0) ) return len_buf - len_tmp;
-    if (0==len_tmp || true != IterToNextNode_(*buf_tmp, &iter_trie)) return -1;
+    if ( unlikely(iter_trie->refcnt_>0) ) {
+      return len_buf - len_tmp;
+    }
+
+    if (0==len_tmp || true != IterToNextNode_(*buf_tmp, &iter_trie)) {
+      return -1;
+    }
  
     ++buf_tmp;
     --len_tmp;
@@ -76,4 +86,26 @@ int SimpleTrie::HasPrefixOf(const char* buf, size_t len_buf) const {
   return -1;
 }
 
-std::ostringstream& operator<<(std::ostringstream& oss, const SimpleTrie& simple_trie);
+void SimpleTrie::PrefixesOf(const char* buf, size_t len_buf, std::vector<size_t> &offsets) const {
+  const char* buf_tmp = buf;
+  size_t len_tmp = len_buf;
+  const SimpleTrie* iter_trie = this;
+  for (;;) {
+    if ( unlikely(iter_trie->refcnt_>0) ) {
+      offsets.push_back(len_buf-len_tmp);
+    }
+
+    if (0==len_tmp || true != IterToNextNode_(*buf_tmp, &iter_trie)) {
+      return -1;
+    }
+ 
+    ++buf_tmp;
+    --len_tmp;
+  }
+  return -1;
+}
+
+std::ostringstream& operator<<(std::ostringstream& oss, const typename xforce::SimpleTrie& simple_trie);
+
+}
+
