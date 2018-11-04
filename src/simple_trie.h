@@ -96,13 +96,13 @@ void SimpleTrie::PrefixesOf(const char* buf, size_t len_buf, std::vector<size_t>
     }
 
     if (0==len_tmp || true != IterToNextNode_(*buf_tmp, &iter_trie)) {
-      return -1;
+      return;
     }
  
     ++buf_tmp;
     --len_tmp;
   }
-  return -1;
+  return;
 }
 
 std::ostringstream& operator<<(std::ostringstream& oss, const typename xforce::SimpleTrie& simple_trie);

@@ -111,6 +111,13 @@ class JsonType {
   Self& operator=(const std::string& str_val) { return operator=(str_val.c_str()); }
   Self& operator=(const JsonType& json_val);
 
+  inline void Append(bool bool_val);
+  inline void Append(int int_val);
+  inline void Append(int64_t int_val);
+  inline void Append(double double_val);
+  inline void Append(const char* str_val);
+  inline void Append(const std::string& str_val) { return Append(str_val.c_str()); }
+
   inline bool operator==(bool bool_val);
   inline bool operator==(int int_val);
   inline bool operator==(int64_t int_val);
@@ -205,6 +212,36 @@ JsonType::JsonType(JsonValType::Type type) {
 JsonType::JsonType(const JsonType& json_val) {
   shared_json_val_=NULL;
   operator=(json_val);
+}
+
+#define APPEND_NAIVE_TYPE(data_type, val_type, data_member) \
+  void JsonType::Append(data_type data_val) { \
+    if (JsonValType::kList != shared_json_val_->type) { \
+      Reset_(JsonValType::kList); \
+    } \
+    Normalize_(); \
+    \
+    JsonType newJsonType(val_type); \
+    newJsonType.shared_json_val_->data.data_member = data_val; \
+    shared_json_val_->data.list_val->push_back(newJsonType); \
+  }
+
+APPEND_NAIVE_TYPE(bool,    JsonValType::kBool,   bool_val)
+APPEND_NAIVE_TYPE(int64_t, JsonValType::kInt,    int_val)
+APPEND_NAIVE_TYPE(int,     JsonValType::kInt,    int_val)
+APPEND_NAIVE_TYPE(double,  JsonValType::kDouble, double_val)
+
+#undef APPEND_NAIVE_TYPE
+
+void JsonType::Append(const char* str_val) {
+  if (JsonValType::kList != shared_json_val_->type) {
+    Reset_(JsonValType::kList);
+  }
+  Normalize_();
+
+  JsonType newJsonType(JsonValType::kStr);
+  newJsonType.shared_json_val_->data.str_val->assign(str_val);
+  shared_json_val_->data.list_val->push_back(newJsonType); 
 }
 
 bool JsonType::operator==(bool bool_val) {

@@ -6,6 +6,7 @@
 #include <list>
 #include <tr1/unordered_map>
 #include <tr1/unordered_set>
+#include <queue>
 #include <fstream>
 #include <iostream>
 #include <sstream>

@@ -101,7 +101,7 @@ char* StrHelper::Wstr2Str(const std::wstring &wstr) {
   bzero(dBuf, dSize);
 
   int ret = std::wcstombs(dBuf, wstr.c_str(), dSize);
-  if (ret>0) {
+  if (ret>=0) {
     return dBuf;
   } else {
     return NULL;
@@ -111,6 +111,7 @@ char* StrHelper::Wstr2Str(const std::wstring &wstr) {
 bool StrHelper::Wstr2Str(const std::wstring &wstr, std::string &str) {
   char *buf = Wstr2Str(wstr);
   if (buf == NULL) {
+    delete [] buf;
     return false;
   }
 
@@ -125,7 +126,8 @@ bool StrHelper::Str2Wstr(const char *str, std::wstring &wstr) {
   wmemset(wchars, 0, len);
 
   int ret = std::mbstowcs(wchars, str, len);
-  if (ret<=0) {
+  if (ret<0) {
+    delete [] wchars;
     return false;
   }
 
