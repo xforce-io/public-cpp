@@ -67,6 +67,7 @@ add_custom_command(TARGET public-cpp
   COMMAND cp ${PUBLIC_CPP_SRC_DIR}/str_helper.hpp ${PUBLIC_CPP_INC_OUTPUT_PATH}/
   COMMAND cp ${PUBLIC_CPP_SRC_DIR}/multi_array_helper.hpp ${PUBLIC_CPP_INC_OUTPUT_PATH}/
   COMMAND cp ${PUBLIC_CPP_SRC_DIR}/simple_trie.h ${PUBLIC_CPP_INC_OUTPUT_PATH}/
+  COMMAND cp ${PUBLIC_CPP_SRC_DIR}/req_tracer.h ${PUBLIC_CPP_INC_OUTPUT_PATH}/
   COMMAND git log | head -n 1 > ${PUBLIC_CPP_OUTPUT_PATH}/version
 )
 

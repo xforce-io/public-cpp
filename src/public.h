@@ -20,3 +20,4 @@
 #include "str_helper.hpp"
 #include "multi_array_helper.hpp"
 #include "simple_trie.h"
+#include "req_tracer.h"
