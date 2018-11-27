@@ -6,8 +6,29 @@ namespace xforce {
 
 class StrHelper {
   public:
-    inline static void SplitStr(const std::string& str, char sep, std::vector<std::string>& vals);
-    inline static void SplitStr(const char* str, char sep, std::vector<std::string>& vals);
+    template <typename StrType, typename CharType>
+    inline static void SplitStr(
+        const StrType &str, 
+        CharType sep, 
+        std::vector<StrType> &vals);
+
+    template <typename StrType, typename CharType>
+    inline static void SplitStr(
+        const CharType *str, 
+        CharType sep, 
+        std::vector<StrType> &vals);
+
+    template <typename StrType>
+    inline static void SplitStr(
+        const StrType &str, 
+        const StrType &seps, 
+        std::vector<StrType> &vals);
+
+    template <typename StrType, typename CharType>
+    inline static void SplitStr(
+        const CharType *str, 
+        const StrType &seps, 
+        std::vector<StrType> &vals);
 
     template <typename T>
     inline static bool GetNum(IN  const char* str, OUT T& num);
@@ -25,29 +46,52 @@ class StrHelper {
     inline static bool Wstr2Str(const std::wstring &wstr, std::string &str);
     inline static bool Str2Wstr(const char *str, std::wstring &wstr);
     inline static bool Str2Wstr(const std::string &str, std::wstring &wstr);
+
+  private:
+    template <typename StrType, typename CharType>
+    inline static void SplitStr(
+        const CharType *str, 
+        const CharType *sep, 
+        size_t numSeps, 
+        std::vector<StrType> &vals);
+
+    template <typename CharType>
+    inline static bool SepContained(
+        const CharType *sep, 
+        size_t numSeps, 
+        CharType theSep);
 };
 
-void StrHelper::SplitStr(const std::string& str, char sep, std::vector<std::string>& vals) {
-    SplitStr(str.c_str(), sep, vals);
+template <typename StrType, typename CharType>
+void StrHelper::SplitStr(
+    const StrType &str, 
+    CharType sep, 
+    std::vector<StrType> &vals) {
+  SplitStr(str.c_str(), &sep, 1, vals);
 }
 
-void StrHelper::SplitStr(const char* str, char sep, std::vector<std::string>& vals) {
-    vals.clear();
+template <typename StrType, typename CharType>
+void StrHelper::SplitStr(
+    const CharType *str, 
+    CharType sep, 
+    std::vector<StrType> &vals) {
+  SplitStr(str, &sep, 1, vals);
+}
 
-    std::string tmp_str;
-    const char *ptr_0=str, *ptr_1=ptr_0;
-    while (true) {
-        while ('\0' != *ptr_1 && sep != *ptr_1) {
-            ++ptr_1;
-        }
+template <typename StrType>
+void StrHelper::SplitStr(
+    const StrType &str, 
+    const StrType &seps, 
+    std::vector<StrType> &vals) {
+  SplitStr(str.c_str(), seps.c_str(), seps.length(), vals);
+}
 
-        tmp_str.assign("");
-        tmp_str.append(ptr_0, ptr_1-ptr_0);
-        vals.push_back(tmp_str);
-
-        if ('\0' == *ptr_1) break;
-        ptr_0 = ++ptr_1;
-    }
+template <typename StrType, typename CharType>
+void StrHelper::SplitStr(
+    const CharType *str, 
+    const StrType &seps, 
+    std::vector<StrType> &vals) {
+  SplitStr(str, seps.c_str(), seps.length(), vals);
 }
 
 template <typename T>
@@ -138,6 +182,42 @@ bool StrHelper::Str2Wstr(const char *str, std::wstring &wstr) {
 
 bool StrHelper::Str2Wstr(const std::string &str, std::wstring &wstr) {
   return Str2Wstr(str.c_str(), wstr);
+}
+
+template <typename StrType, typename CharType>
+void StrHelper::SplitStr(
+        const CharType *str, 
+        const CharType *sep, 
+        size_t numSeps, 
+        std::vector<StrType> &vals) {
+    vals.clear();
+
+    StrType tmp_str;
+    const CharType *ptr_0=str, *ptr_1=ptr_0;
+    while (true) {
+        while ('\0' != *ptr_1 && !SepContained<CharType>(sep, numSeps, *ptr_1)) {
+            ++ptr_1;
+        }
+
+        tmp_str = StrType();
+        tmp_str.append(ptr_0, ptr_1-ptr_0);
+        if (!tmp_str.empty()) {
+          vals.push_back(tmp_str);
+        }
+
+        if ('\0' == *ptr_1) break;
+        ptr_0 = ++ptr_1;
+    }
+}
+
+template <typename CharType>
+bool StrHelper::SepContained(const CharType *sep, size_t numSeps, CharType theSep) {
+  for (size_t i=0; i < numSeps; ++i) {
+    if (theSep == sep[i]) {
+      return true;
+    }
+  }
+  return false;
 }
 
 }
