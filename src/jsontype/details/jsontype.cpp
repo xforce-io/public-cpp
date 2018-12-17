@@ -365,8 +365,9 @@ void SharedJsonVal::JsonParseUtil::IgnoreBlanks_(const char*& str) {
   }
 
 ASSIGN_NAIVE_TYPE(bool,    JsonValType::kBool,   bool_val)
-ASSIGN_NAIVE_TYPE(int64_t, JsonValType::kInt,    int_val)
 ASSIGN_NAIVE_TYPE(int,     JsonValType::kInt,    int_val)
+ASSIGN_NAIVE_TYPE(int64_t, JsonValType::kInt,    int_val)
+ASSIGN_NAIVE_TYPE(size_t,  JsonValType::kInt,    int_val)
 ASSIGN_NAIVE_TYPE(double,  JsonValType::kDouble, double_val)
 
 #undef ASSIGN_NAIVE_TYPE

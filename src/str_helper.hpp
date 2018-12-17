@@ -36,8 +36,11 @@ class StrHelper {
     template <typename T>
 	  inline static std::string GetStr(IN T num );
 
-    inline static std::string Trim(const std::string &str);
-    inline static bool NaiveChar(char c);
+    template <typename StrType>
+    inline static StrType Trim(const StrType &str);
+
+    template <typename CharType>
+    inline static bool NaiveChar(CharType c);
 
     /////////////////////////////////////////
     // wstring
@@ -114,7 +117,8 @@ std::string StrHelper::GetStr(IN T num ) {
     return ss.str();
 }
 
-std::string StrHelper::Trim(const std::string &str) {
+template <typename StrType>
+StrType StrHelper::Trim(const StrType &str) {
   size_t start = 0;
   while (start < str.length() && NaiveChar(str[start])) {
     ++start;
@@ -128,11 +132,12 @@ std::string StrHelper::Trim(const std::string &str) {
   if (start != str.length()) {
     return str.substr(start, end-start+1);
   } else {
-    return std::string();
+    return StrType();
   }
 }
 
-bool StrHelper::NaiveChar(char c) {
+template <typename CharType>
+bool StrHelper::NaiveChar(CharType c) {
   return c == '\t' ||
     c == ' ' ||
     c == '\r' ||
