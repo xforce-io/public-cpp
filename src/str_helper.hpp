@@ -42,9 +42,9 @@ class StrHelper {
     template <typename CharType>
     inline static bool NaiveChar(CharType c);
 
-    /////////////////////////////////////////
-    // wstring
-    /////////////////////////////////////////
+    template <typename StrType>
+    inline static void ToLowerCase(StrType &str);
+
     inline static char* Wstr2Str(const std::wstring &wstr);
     inline static bool Wstr2Str(const std::wstring &wstr, std::string &str);
     inline static bool Str2Wstr(const char *str, std::wstring &wstr);
@@ -142,6 +142,15 @@ bool StrHelper::NaiveChar(CharType c) {
     c == ' ' ||
     c == '\r' ||
     c == '\n';
+}
+
+template <typename StrType>
+void StrHelper::ToLowerCase(StrType &str) {
+  for (size_t i=0; i < str.length(); ++i) {
+    if (str[i] >= 'A' && str[i] <= 'Z') {
+      str[i] += 32;
+    }
+  }
 }
 
 char* StrHelper::Wstr2Str(const std::wstring &wstr) {

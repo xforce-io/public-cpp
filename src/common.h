@@ -4,8 +4,8 @@
 #include <new>
 #include <vector>
 #include <list>
-#include <tr1/unordered_map>
-#include <tr1/unordered_set>
+#include <unordered_map>
+#include <unordered_set>
 #include <queue>
 #include <fstream>
 #include <iostream>
