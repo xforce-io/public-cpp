@@ -27,7 +27,7 @@ struct SharedJsonVal {
   typedef SharedJsonVal Self;
   typedef std::string StrType;
   typedef std::vector<JsonType> ListType;
-  typedef std::tr1::unordered_map<std::string, JsonType> DictType;
+  typedef std::unordered_map<std::string, JsonType> DictType;
  
   typedef PoolObjs<StrType> PoolStr;
   typedef PoolObjs<ListType> PoolList;

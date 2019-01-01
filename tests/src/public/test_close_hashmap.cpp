@@ -90,7 +90,7 @@ TEST_F(TestCloseHashmap, erase) {
 }
 
 TEST_F(TestCloseHashmap, pressure) {
-  typedef std::tr1::unordered_set<size_t> CmpContainer;
+  typedef std::unordered_set<size_t> CmpContainer;
   typedef CloseHashmap<size_t, size_t> TargetContainer;
 
   static const size_t kTimesTest=1;
