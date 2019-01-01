@@ -41,7 +41,7 @@ class PtrEqF {
   CompF comp_;
 };
 
-template < typename T, typename HashF=std::tr1::hash<T> >
+template < typename T, typename HashF=std::hash<T> >
 class PtrHashF {
  public:
   explicit PtrHashF(const HashF hash) : hash_(hash) {}
