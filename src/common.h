@@ -13,6 +13,7 @@
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
+#include <regex>
 #include <assert.h>
 
 #include <limits>
