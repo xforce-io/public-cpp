@@ -145,4 +145,23 @@ int IOHelper::WriteVecNonBlock(int fd, iovec* iov, size_t& num_iov) {
   }
 }
 
+int IOHelper::ScanFiles(std::string inputDir, std::vector<std::string> &filepaths) {
+  DIR *dir = opendir(inputDir.c_str());
+  if(nullptr == dir) {
+    return -1;
+  }
+
+  struct dirent *dirent;
+  while (dirent = readdir(dir)) {
+    std::string tmpFileName = dirent->d_name;
+    if("." == tmpFileName || ".." == tmpFileName) {
+      continue;
+    } else {
+      filepaths.push_back(tmpFileName);
+    }
+  }
+  closedir(dir);
+  return filepaths.size();
+}
+
 }
