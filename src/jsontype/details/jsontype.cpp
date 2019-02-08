@@ -174,7 +174,6 @@ JsonType* SharedJsonVal::JsonParseUtil::ParseJson(const char*& str) {
   static const size_t kLengthLeft = 20;
   std::string err(str);
   err.erase(kLengthLeft);
-  WARN("invalid_fragment[" << err << "]");
   return NULL;
 
 }
