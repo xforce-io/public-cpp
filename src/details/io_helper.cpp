@@ -145,7 +145,7 @@ int IOHelper::WriteVecNonBlock(int fd, iovec* iov, size_t& num_iov) {
   }
 }
 
-int IOHelper::ScanFiles(std::string inputDir, std::vector<std::string> &filepaths) {
+int IOHelper::ScanFiles(const std::string &inputDir, std::vector<std::string> &filepaths) {
   DIR *dir = opendir(inputDir.c_str());
   if(nullptr == dir) {
     return -1;
