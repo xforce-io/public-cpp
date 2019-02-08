@@ -166,8 +166,6 @@ int IOHelper::ScanFiles(const std::string &inputDir, std::vector<std::string> &f
 }
 
 bool IOHelper::ReadLinesFromFilepath(const std::string &filepath, std::vector<std::string> &lines) {
-  lines.clear();
-
   FILE *fp = fopen(filepath.c_str(), "r");
   if (nullptr == fp) {
     return false;
