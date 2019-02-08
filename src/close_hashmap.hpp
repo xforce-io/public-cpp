@@ -8,7 +8,7 @@ template <
   typename Key, 
   typename Val, 
   typename KeyEqualF = std::equal_to<Key>,
-  typename HashF = std::tr1::hash<Key> >
+  typename HashF = std::hash<Key> >
 class CloseHashmap {
  private:
   typedef CloseHashmap<Key, Val, KeyEqualF, HashF> Self;

@@ -19,7 +19,7 @@ set(PUBLIC_CPP_SRC_DIR "${CMAKE_SOURCE_DIR}/src/")
 
 FILE(GLOB_RECURSE PUBLIC_CPP_FILES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -W -Wall -Wno-deprecated -Wno-invalid-offsetof -Wno-strict-aliasing -O2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -W -Wall -Wno-deprecated -Wno-invalid-offsetof -Wno-strict-aliasing -std=c++11 -O2")
 
 add_library(public-cpp
   ${PUBLIC_CPP_FILES})
@@ -67,6 +67,7 @@ add_custom_command(TARGET public-cpp
   COMMAND cp ${PUBLIC_CPP_SRC_DIR}/str_helper.hpp ${PUBLIC_CPP_INC_OUTPUT_PATH}/
   COMMAND cp ${PUBLIC_CPP_SRC_DIR}/multi_array_helper.hpp ${PUBLIC_CPP_INC_OUTPUT_PATH}/
   COMMAND cp ${PUBLIC_CPP_SRC_DIR}/simple_trie.h ${PUBLIC_CPP_INC_OUTPUT_PATH}/
+  COMMAND cp ${PUBLIC_CPP_SRC_DIR}/req_tracer.h ${PUBLIC_CPP_INC_OUTPUT_PATH}/
   COMMAND git log | head -n 1 > ${PUBLIC_CPP_OUTPUT_PATH}/version
 )
 

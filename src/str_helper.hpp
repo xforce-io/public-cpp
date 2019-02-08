@@ -6,8 +6,29 @@ namespace xforce {
 
 class StrHelper {
   public:
-    inline static void SplitStr(const std::string& str, char sep, std::vector<std::string>& vals);
-    inline static void SplitStr(const char* str, char sep, std::vector<std::string>& vals);
+    template <typename StrType, typename CharType>
+    inline static void SplitStr(
+        const StrType &str, 
+        CharType sep, 
+        std::vector<StrType> &vals);
+
+    template <typename StrType, typename CharType>
+    inline static void SplitStr(
+        const CharType *str, 
+        CharType sep, 
+        std::vector<StrType> &vals);
+
+    template <typename StrType>
+    inline static void SplitStr(
+        const StrType &str, 
+        const StrType &seps, 
+        std::vector<StrType> &vals);
+
+    template <typename StrType, typename CharType>
+    inline static void SplitStr(
+        const CharType *str, 
+        const StrType &seps, 
+        std::vector<StrType> &vals);
 
     template <typename T>
     inline static bool GetNum(IN  const char* str, OUT T& num);
@@ -15,39 +36,65 @@ class StrHelper {
     template <typename T>
 	  inline static std::string GetStr(IN T num );
 
-    inline static std::string Trim(const std::string &str);
-    inline static bool NaiveChar(char c);
+    template <typename StrType>
+    inline static StrType Trim(const StrType &str);
 
-    /////////////////////////////////////////
-    // wstring
-    /////////////////////////////////////////
+    template <typename CharType>
+    inline static bool NaiveChar(CharType c);
+
+    template <typename StrType>
+    inline static void ToLowerCase(StrType &str);
+
     inline static char* Wstr2Str(const std::wstring &wstr);
     inline static bool Wstr2Str(const std::wstring &wstr, std::string &str);
     inline static bool Str2Wstr(const char *str, std::wstring &wstr);
     inline static bool Str2Wstr(const std::string &str, std::wstring &wstr);
+
+  private:
+    template <typename StrType, typename CharType>
+    inline static void SplitStr(
+        const CharType *str, 
+        const CharType *sep, 
+        size_t numSeps, 
+        std::vector<StrType> &vals);
+
+    template <typename CharType>
+    inline static bool SepContained(
+        const CharType *sep, 
+        size_t numSeps, 
+        CharType theSep);
 };
 
-void StrHelper::SplitStr(const std::string& str, char sep, std::vector<std::string>& vals) {
-    SplitStr(str.c_str(), sep, vals);
+template <typename StrType, typename CharType>
+void StrHelper::SplitStr(
+    const StrType &str, 
+    CharType sep, 
+    std::vector<StrType> &vals) {
+  SplitStr(str.c_str(), &sep, 1, vals);
 }
 
-void StrHelper::SplitStr(const char* str, char sep, std::vector<std::string>& vals) {
-    vals.clear();
+template <typename StrType, typename CharType>
+void StrHelper::SplitStr(
+    const CharType *str, 
+    CharType sep, 
+    std::vector<StrType> &vals) {
+  SplitStr(str, &sep, 1, vals);
+}
 
-    std::string tmp_str;
-    const char *ptr_0=str, *ptr_1=ptr_0;
-    while (true) {
-        while ('\0' != *ptr_1 && sep != *ptr_1) {
-            ++ptr_1;
-        }
+template <typename StrType>
+void StrHelper::SplitStr(
+    const StrType &str, 
+    const StrType &seps, 
+    std::vector<StrType> &vals) {
+  SplitStr(str.c_str(), seps.c_str(), seps.length(), vals);
+}
 
-        tmp_str.assign("");
-        tmp_str.append(ptr_0, ptr_1-ptr_0);
-        vals.push_back(tmp_str);
-
-        if ('\0' == *ptr_1) break;
-        ptr_0 = ++ptr_1;
-    }
+template <typename StrType, typename CharType>
+void StrHelper::SplitStr(
+    const CharType *str, 
+    const StrType &seps, 
+    std::vector<StrType> &vals) {
+  SplitStr(str, seps.c_str(), seps.length(), vals);
 }
 
 template <typename T>
@@ -70,7 +117,8 @@ std::string StrHelper::GetStr(IN T num ) {
     return ss.str();
 }
 
-std::string StrHelper::Trim(const std::string &str) {
+template <typename StrType>
+StrType StrHelper::Trim(const StrType &str) {
   size_t start = 0;
   while (start < str.length() && NaiveChar(str[start])) {
     ++start;
@@ -84,15 +132,25 @@ std::string StrHelper::Trim(const std::string &str) {
   if (start != str.length()) {
     return str.substr(start, end-start+1);
   } else {
-    return std::string();
+    return StrType();
   }
 }
 
-bool StrHelper::NaiveChar(char c) {
+template <typename CharType>
+bool StrHelper::NaiveChar(CharType c) {
   return c == '\t' ||
     c == ' ' ||
     c == '\r' ||
     c == '\n';
+}
+
+template <typename StrType>
+void StrHelper::ToLowerCase(StrType &str) {
+  for (size_t i=0; i < str.length(); ++i) {
+    if (str[i] >= 'A' && str[i] <= 'Z') {
+      str[i] += 32;
+    }
+  }
 }
 
 char* StrHelper::Wstr2Str(const std::wstring &wstr) {
@@ -101,7 +159,7 @@ char* StrHelper::Wstr2Str(const std::wstring &wstr) {
   bzero(dBuf, dSize);
 
   int ret = std::wcstombs(dBuf, wstr.c_str(), dSize);
-  if (ret>0) {
+  if (ret>=0) {
     return dBuf;
   } else {
     return NULL;
@@ -111,6 +169,7 @@ char* StrHelper::Wstr2Str(const std::wstring &wstr) {
 bool StrHelper::Wstr2Str(const std::wstring &wstr, std::string &str) {
   char *buf = Wstr2Str(wstr);
   if (buf == NULL) {
+    delete [] buf;
     return false;
   }
 
@@ -125,7 +184,8 @@ bool StrHelper::Str2Wstr(const char *str, std::wstring &wstr) {
   wmemset(wchars, 0, len);
 
   int ret = std::mbstowcs(wchars, str, len);
-  if (ret<=0) {
+  if (ret<0) {
+    delete [] wchars;
     return false;
   }
 
@@ -136,6 +196,42 @@ bool StrHelper::Str2Wstr(const char *str, std::wstring &wstr) {
 
 bool StrHelper::Str2Wstr(const std::string &str, std::wstring &wstr) {
   return Str2Wstr(str.c_str(), wstr);
+}
+
+template <typename StrType, typename CharType>
+void StrHelper::SplitStr(
+        const CharType *str, 
+        const CharType *sep, 
+        size_t numSeps, 
+        std::vector<StrType> &vals) {
+    vals.clear();
+
+    StrType tmp_str;
+    const CharType *ptr_0=str, *ptr_1=ptr_0;
+    while (true) {
+        while ('\0' != *ptr_1 && !SepContained<CharType>(sep, numSeps, *ptr_1)) {
+            ++ptr_1;
+        }
+
+        tmp_str = StrType();
+        tmp_str.append(ptr_0, ptr_1-ptr_0);
+        if (!tmp_str.empty()) {
+          vals.push_back(tmp_str);
+        }
+
+        if ('\0' == *ptr_1) break;
+        ptr_0 = ++ptr_1;
+    }
+}
+
+template <typename CharType>
+bool StrHelper::SepContained(const CharType *sep, size_t numSeps, CharType theSep) {
+  for (size_t i=0; i < numSeps; ++i) {
+    if (theSep == sep[i]) {
+      return true;
+    }
+  }
+  return false;
 }
 
 }

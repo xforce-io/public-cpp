@@ -1,5 +1,7 @@
 #include "../simple_trie.h"
 
+namespace xforce {
+
 SimpleTrie::SimpleTrie() : 
     num_children_(0), 
     refcnt_(0),
@@ -14,19 +16,26 @@ int SimpleTrie::Insert(const char* buf, size_t len_buf) {
   SimpleTrie* next_node_to_insert;
   if (0==num_children_) {
     child_ = new (std::nothrow) SimpleTrie;
-    if (NULL==child_) return -1;
+    if (NULL==child_) {
+      return -1;
+    }
+
     num_children_=1;
     child_index_=*buf;
     next_node_to_insert = child_;
   } else if (1==num_children_) {
     if (SCAST<TypeChildIndex>(*buf) != child_index_) {
       SimpleTrie** tmp_children_ = new (std::nothrow) SimpleTrie* [kMaxNumChildren];
-      if (NULL==tmp_children_) return -1;
+      if (NULL==tmp_children_) {
+        return -1;
+      }
 
       bzero(tmp_children_, sizeof(*tmp_children_)*kMaxNumChildren);
       tmp_children_[child_index_] = child_;
       tmp_children_[SCAST<TypeChildIndex>(*buf)] = new (std::nothrow) SimpleTrie;
-      if (NULL==tmp_children_[SCAST<TypeChildIndex>(*buf)]) return -1;
+      if (NULL==tmp_children_[SCAST<TypeChildIndex>(*buf)]) {
+        return -1;
+      }
 
       children_ = tmp_children_;
       ++num_children_;
@@ -37,7 +46,9 @@ int SimpleTrie::Insert(const char* buf, size_t len_buf) {
   } else {
     if (NULL == children_[SCAST<TypeChildIndex>(*buf)]) {
       children_[SCAST<TypeChildIndex>(*buf)] = new (std::nothrow) SimpleTrie;
-      if (NULL == children_[SCAST<TypeChildIndex>(*buf)]) return -1;
+      if (NULL == children_[SCAST<TypeChildIndex>(*buf)]) {
+        return -1;
+      }
       ++num_children_;
     }
     next_node_to_insert = children_[SCAST<TypeChildIndex>(*buf)];
@@ -67,7 +78,9 @@ SimpleTrie::~SimpleTrie() {
 
 int SimpleTrie::Erase_(const char* buf, size_t len_buf) {
   if ( unlikely(0==len_buf) ) {
-    if ( unlikely(0==refcnt_) ) return -1;
+    if ( unlikely(0==refcnt_) ) {
+      return -1;
+    }
 
     --refcnt_;
     return (0==refcnt_ && 0==num_children_) ? 1 : 0;
@@ -135,7 +148,7 @@ bool SimpleTrie::IterToNextNode_(char child_index, const SimpleTrie** iter_trie)
   return true;
 }
 
-std::ostringstream& operator<<(std::ostringstream& oss, const SimpleTrie& simple_trie) {
+std::ostringstream& operator<<(std::ostringstream& oss, const typename xforce::SimpleTrie& simple_trie) {
   oss << "{ \"num_children_\": " << simple_trie.num_children_ 
     << ", \"refcnt_\": " << simple_trie.refcnt_ 
     << ", \"child_index_\": " << simple_trie.child_index_ << ", ";
@@ -144,7 +157,7 @@ std::ostringstream& operator<<(std::ostringstream& oss, const SimpleTrie& simple
     oss << "\"" << 0 << "\":";
     oss << *(simple_trie.child_) << ", "; 
   } else if (simple_trie.num_children_>1) {
-    for (size_t i=0; i<SimpleTrie::kMaxNumChildren; ++i) {
+    for (size_t i=0; i < xforce::SimpleTrie::kMaxNumChildren; ++i) {
       if (NULL!=simple_trie.children_[i]) {
         oss << "\"" << i << "\":";
         oss << *(simple_trie.children_[i]) << ", "; 
@@ -153,4 +166,6 @@ std::ostringstream& operator<<(std::ostringstream& oss, const SimpleTrie& simple
   }  
   oss << "}";
   return oss;
+}
+
 }

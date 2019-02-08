@@ -9,7 +9,7 @@ template <typename Obj>
 class DelayDelPtr {
  private:
   typedef DelayDelPtr<Obj> Self;
-  typedef std::tr1::unordered_map< size_t, std::pair<Obj*, time_t> > DelayDelPtrMap;
+  typedef std::unordered_map< size_t, std::pair<Obj*, time_t> > DelayDelPtrMap;
   
  public:
   static const time_t kDefaultDelayDelTimeSec=60;

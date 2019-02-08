@@ -27,7 +27,7 @@ struct SharedJsonVal {
   typedef SharedJsonVal Self;
   typedef std::string StrType;
   typedef std::vector<JsonType> ListType;
-  typedef std::tr1::unordered_map<std::string, JsonType> DictType;
+  typedef std::unordered_map<std::string, JsonType> DictType;
  
   typedef PoolObjs<StrType> PoolStr;
   typedef PoolObjs<ListType> PoolList;
@@ -106,14 +106,24 @@ class JsonType {
   Self& operator=(bool bool_val);
   Self& operator=(int int_val);
   Self& operator=(int64_t int_val);
+  Self& operator=(size_t size_val);
   Self& operator=(double double_val);
   Self& operator=(const char* str_val);
   Self& operator=(const std::string& str_val) { return operator=(str_val.c_str()); }
   Self& operator=(const JsonType& json_val);
 
+  inline void Append(bool bool_val);
+  inline void Append(int int_val);
+  inline void Append(int64_t int_val);
+  inline void Append(size_t size_val);
+  inline void Append(double double_val);
+  inline void Append(const char* str_val);
+  inline void Append(const std::string& str_val) { return Append(str_val.c_str()); }
+
   inline bool operator==(bool bool_val);
   inline bool operator==(int int_val);
   inline bool operator==(int64_t int_val);
+  inline bool operator==(size_t size_val);
   inline bool operator==(double double_val);
   inline bool operator==(const char* str_val);
   inline bool operator==(const std::string& str_val);
@@ -121,13 +131,13 @@ class JsonType {
   JsonValType::Type Type() const { return shared_json_val_->type; }
   inline size_t Size() const;
 
-  bool IsNull() const { return JsonValType::kNull == shared_json_val_->type; }
-  bool IsBool() const { return JsonValType::kBool == shared_json_val_->type; }
-  bool IsInt() const { return JsonValType::kInt == shared_json_val_->type; }
-  bool IsDouble() const { return JsonValType::kDouble == shared_json_val_->type; }
-  bool IsStr() const { return JsonValType::kStr == shared_json_val_->type; }
-  bool IsList() const { return JsonValType::kList == shared_json_val_->type; }
-  bool IsDict() const { return JsonValType::kDict == shared_json_val_->type; }
+  inline bool IsNull() const; 
+  inline bool IsBool() const;
+  inline bool IsInt() const;
+  inline bool IsDouble() const;
+  inline bool IsStr() const;
+  inline bool IsList() const;
+  inline bool IsDict() const;
 
   bool AsBool() const { return shared_json_val_->data.bool_val; }
   int64_t AsInt() const { return shared_json_val_->data.int_val; }
@@ -207,6 +217,37 @@ JsonType::JsonType(const JsonType& json_val) {
   operator=(json_val);
 }
 
+#define APPEND_NAIVE_TYPE(data_type, val_type, data_member) \
+  void JsonType::Append(data_type data_val) { \
+    if (JsonValType::kList != shared_json_val_->type) { \
+      Reset_(JsonValType::kList); \
+    } \
+    Normalize_(); \
+    \
+    JsonType newJsonType(val_type); \
+    newJsonType.shared_json_val_->data.data_member = data_val; \
+    shared_json_val_->data.list_val->push_back(newJsonType); \
+  }
+
+APPEND_NAIVE_TYPE(bool,    JsonValType::kBool,   bool_val)
+APPEND_NAIVE_TYPE(int,     JsonValType::kInt,    int_val)
+APPEND_NAIVE_TYPE(int64_t, JsonValType::kInt,    int_val)
+APPEND_NAIVE_TYPE(size_t,  JsonValType::kInt,    int_val)
+APPEND_NAIVE_TYPE(double,  JsonValType::kDouble, double_val)
+
+#undef APPEND_NAIVE_TYPE
+
+void JsonType::Append(const char* str_val) {
+  if (JsonValType::kList != shared_json_val_->type) {
+    Reset_(JsonValType::kList);
+  }
+  Normalize_();
+
+  JsonType newJsonType(JsonValType::kStr);
+  newJsonType.shared_json_val_->data.str_val->assign(str_val);
+  shared_json_val_->data.list_val->push_back(newJsonType); 
+}
+
 bool JsonType::operator==(bool bool_val) {
   return JsonValType::kBool == shared_json_val_->type 
     && bool_val == shared_json_val_->data.bool_val;
@@ -219,6 +260,10 @@ bool JsonType::operator==(int int_val) {
 bool JsonType::operator==(int64_t int_val) {
   return JsonValType::kInt == shared_json_val_->type 
     && int_val == shared_json_val_->data.int_val;
+}
+
+bool JsonType::operator==(size_t size_val) {
+  return operator==((int64_t)size_val);
 }
 
 bool JsonType::operator==(double double_val) {
@@ -246,6 +291,34 @@ size_t JsonType::Size() const {
     case JsonValType::kList : return shared_json_val_->data.list_val->size();
     default : return shared_json_val_->data.dict_val->size();
   }
+}
+
+bool JsonType::IsNull() const { 
+  return JsonValType::kNull == shared_json_val_->type; 
+}
+
+bool JsonType::IsBool() const { 
+  return JsonValType::kBool == shared_json_val_->type; 
+}
+
+bool JsonType::IsInt() const { 
+  return JsonValType::kInt == shared_json_val_->type; 
+}
+
+bool JsonType::IsDouble() const { 
+  return JsonValType::kDouble == shared_json_val_->type; 
+}
+
+bool JsonType::IsStr() const { 
+  return JsonValType::kStr == shared_json_val_->type; 
+}
+
+bool JsonType::IsList() const { 
+  return JsonValType::kList == shared_json_val_->type; 
+}
+
+bool JsonType::IsDict() const { 
+  return JsonValType::kDict == shared_json_val_->type; 
 }
 
 const JsonType& JsonType::operator[](size_t index) const {
