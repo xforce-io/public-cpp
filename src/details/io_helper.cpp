@@ -1,4 +1,5 @@
 #include "../io_helper.h"
+#include "../str_helper.hpp"
 
 namespace xforce {
 
@@ -152,7 +153,7 @@ int IOHelper::ScanFiles(const std::string &inputDir, std::vector<std::string> &f
   }
 
   struct dirent *dirent;
-  while (dirent = readdir(dir)) {
+  while ((dirent = readdir(dir))) {
     std::string tmpFileName = dirent->d_name;
     if("." == tmpFileName || ".." == tmpFileName) {
       continue;
@@ -162,6 +163,34 @@ int IOHelper::ScanFiles(const std::string &inputDir, std::vector<std::string> &f
   }
   closedir(dir);
   return filepaths.size();
+}
+
+bool IOHelper::ReadLinesFromFilepath(const std::string &filepath, std::vector<std::string> &lines) {
+  lines.clear();
+
+  FILE *fp = fopen(filepath.c_str(), "r");
+  if (nullptr == fp) {
+    return false;
+  }
+
+  char buf[4096];
+  char *line = fgets(buf, sizeof(buf), fp);
+  while (nullptr != line) {
+    if ('\n' == buf[strlen(buf) - 1]) {
+      buf[strlen(buf) - 1] = '\0';
+    }
+
+    if ('\r' == buf[strlen(buf) - 1]) {
+      buf[strlen(buf) - 1] = '\0';
+    }
+
+    if (buf[0] != '\0') {
+      lines.push_back(buf);
+    }
+    line = fgets(buf, sizeof(buf), fp);
+  }
+  fclose(fp);
+  return true;
 }
 
 }
