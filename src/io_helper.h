@@ -31,7 +31,7 @@ class IOHelper {
 
   inline static void Close(int fd);
 
-  static int ScanFiles(std::string inputDir, std::vector<std::string> &filepaths);
+  static int ScanFiles(const std::string &inputDir, std::vector<std::string> &filepaths);
 };
 
 bool IOHelper::IpToInt(const char* ipstr, uint32_t& ipint) {
