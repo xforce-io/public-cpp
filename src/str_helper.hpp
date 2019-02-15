@@ -45,10 +45,8 @@ class StrHelper {
     template <typename StrType>
     inline static void ToLowerCase(StrType &str);
 
-    inline static char* Wstr2Str(const std::wstring &wstr);
-    inline static bool Wstr2Str(const std::wstring &wstr, std::string &str);
-    inline static bool Str2Wstr(const char *str, std::wstring &wstr);
-    inline static bool Str2Wstr(const std::string &str, std::wstring &wstr);
+    inline static std::shared_ptr<std::string> Wstr2Str(const std::wstring &wstr);
+    inline static std::shared_ptr<std::wstring> Str2Wstr(const std::string &str);
 
   private:
     template <typename StrType, typename CharType>
@@ -153,49 +151,33 @@ void StrHelper::ToLowerCase(StrType &str) {
   }
 }
 
-char* StrHelper::Wstr2Str(const std::wstring &wstr) {
+std::shared_ptr<std::string> StrHelper::Wstr2Str(const std::wstring &wstr) {
   size_t dSize = wstr.size() * 4 + 1;
   char *dBuf = new char[dSize];
   bzero(dBuf, dSize);
 
   int ret = std::wcstombs(dBuf, wstr.c_str(), dSize);
   if (ret>=0) {
-    return dBuf;
+    return std::make_shared<std::string>(dBuf);
   } else {
-    return NULL;
+    return nullptr;
   }
 }
 
-bool StrHelper::Wstr2Str(const std::wstring &wstr, std::string &str) {
-  char *buf = Wstr2Str(wstr);
-  if (buf == NULL) {
-    delete [] buf;
-    return false;
-  }
-
-  str = buf;
-  delete [] buf;
-  return true;
-}
-
-bool StrHelper::Str2Wstr(const char *str, std::wstring &wstr) {
-  size_t len = strlen(str) + 1;
+std::shared_ptr<std::wstring> StrHelper::Str2Wstr(const std::string &str) {
+  size_t len = str.length() + 1;
   wchar_t *wchars = new wchar_t[len];
   wmemset(wchars, 0, len);
 
-  int ret = std::mbstowcs(wchars, str, len);
+  int ret = std::mbstowcs(wchars, str.c_str(), len);
   if (ret<0) {
     delete [] wchars;
-    return false;
+    return nullptr;
   }
 
-  wstr = wchars;
+  auto result = std::make_shared<std::wstring>(wchars);
   delete [] wchars;
-  return true;
-}
-
-bool StrHelper::Str2Wstr(const std::string &str, std::wstring &wstr) {
-  return Str2Wstr(str.c_str(), wstr);
+  return result;
 }
 
 template <typename StrType, typename CharType>
