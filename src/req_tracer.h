@@ -56,9 +56,9 @@ void ReqTracer::Set(const std::string &key, const std::string &val) {
 }
 
 void ReqTracer::Set(const std::string &key, const std::wstring &val) {
-  std::string valStr;
-  XFC_ASSERT(StrHelper::Wstr2Str(val, valStr));
-  Set(key, valStr);
+  std::shared_ptr<std::string> valStr = StrHelper::Wstr2Str(val);
+  XFC_ASSERT(nullptr != valStr);
+  Set(key, *valStr);
 }
 
 void ReqTracer::Add(const std::string &key, const std::string &val) {
@@ -66,9 +66,9 @@ void ReqTracer::Add(const std::string &key, const std::string &val) {
 }
 
 void ReqTracer::Add(const std::string &key, const std::wstring &val) {
-  std::string valStr;
-  XFC_ASSERT(StrHelper::Wstr2Str(val, valStr));
-  Add(key, valStr);
+  std::shared_ptr<std::string> valStr = StrHelper::Wstr2Str(val);
+  XFC_ASSERT(nullptr != valStr);
+  Add(key, *valStr);
 }
 
 void ReqTracer::Clear() {
