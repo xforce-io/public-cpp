@@ -158,7 +158,7 @@ int IOHelper::ScanFiles(const std::string &inputDir, std::vector<std::string> &f
     if("." == tmpFileName || ".." == tmpFileName) {
       continue;
     } else {
-      filepaths.push_back(tmpFileName);
+      filepaths.push_back(inputDir + "/" + tmpFileName);
     }
   }
   closedir(dir);
