@@ -171,7 +171,7 @@ bool IOHelper::ReadLinesFromFilepath(const std::string &filepath, std::vector<st
     return false;
   }
 
-  char buf[4096];
+  char buf[128*1024];
   char *line = fgets(buf, sizeof(buf), fp);
   while (nullptr != line) {
     if ('\n' == buf[strlen(buf) - 1]) {
