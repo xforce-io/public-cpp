@@ -109,7 +109,8 @@ class JsonType {
   Self& operator=(size_t size_val);
   Self& operator=(double double_val);
   Self& operator=(const char* str_val);
-  Self& operator=(const std::string& str_val) { return operator=(str_val.c_str()); }
+  Self& operator=(const std::string& str_val);
+  Self& operator=(const std::wstring& str_val);
   Self& operator=(const JsonType& json_val);
 
   inline void Append(bool bool_val);

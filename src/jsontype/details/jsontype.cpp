@@ -1,4 +1,5 @@
 #include "../jsontype.h"
+#include "../../str_helper.hpp"
 
 namespace xforce {
 
@@ -392,6 +393,14 @@ JsonType& JsonType::operator=(const char* str_val) {
   }
   shared_json_val_->data.str_val->assign(str_val);
   return *this;
+}
+
+JsonType& JsonType::operator=(const std::string& str_val) {
+  return operator=(str_val.c_str());
+}
+
+JsonType& JsonType::operator=(const std::wstring& str_val) {
+  return operator=(*(StrHelper::Wstr2Str(str_val)));
 }
 
 JsonType& JsonType::operator=(const JsonType& other) {
