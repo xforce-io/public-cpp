@@ -19,13 +19,10 @@ class ThreadPrivacy {
   inline void* Get(size_t no=0) const;
 
   template <typename Privacy>
-  Privacy* Get(
-      size_t no,
-      const Privacy& privacy,
-      bool* first_create=NULL);
-
-  template <typename Privacy>
-  inline Privacy* Get(size_t no=0, bool* first_create=NULL);
+  inline Privacy* Get(
+          size_t no=0,
+          Privacy *privacy_arg=NULL,
+          bool* first_create=NULL);
 
   virtual ~ThreadPrivacy();
 
@@ -33,7 +30,10 @@ class ThreadPrivacy {
   bool Init_();
 
   template <typename Privacy>
-  int Get_(IN size_t no, OUT void*& thread_privacy, OUT Privacies*& privacies);
+  int Get_(
+          IN size_t no,
+          OUT void*& thread_privacy,
+          OUT Privacies*& privacies);
 
   template <typename Privacy>
   inline static void Delete_(void* privacy);
@@ -47,7 +47,7 @@ class ThreadPrivacy {
 };
 
 void* ThreadPrivacy::Get(size_t no) const {
-  if (unlikely(true!=init_)) return NULL;
+  if (unlikely(!init_)) return NULL;
 
   Privacies* privacies = RCAST<Privacies*>(pthread_getspecific(key_));
   if ( unlikely(NULL==privacies) ) return NULL;
@@ -61,49 +61,14 @@ void* ThreadPrivacy::Get(size_t no) const {
 
 template <typename Privacy>
 Privacy* ThreadPrivacy::Get(
-    size_t no, 
-    const Privacy& privacy_tpl,
-    bool* first_create) {
-  XFC_RAII_INIT(NULL)
-
-  void* result;
-  Privacies* privacies;
-  Privacy* privacy=NULL;
-  int ret;
-
-  ret = Get_<Privacy>(no, result, privacies);
-  if (0==ret) {
-    if (NULL!=first_create) *first_create=false;
-    return RCAST<Privacy*>(result);
-  } else if(ret<0) {
-    XFC_FAIL_HANDLE(true)
-  }
-
-  privacy = new (std::nothrow) Privacy(privacy_tpl);
-  XFC_FAIL_HANDLE(NULL==privacy)
-
-  if (no >= privacies->size()) {
-    size_t old_size = privacies->size();
-    privacies->resize(no+1);
-    for (size_t i=old_size; i<no; ++i) (*privacies)[i].first = NULL;
-  }
-  (*privacies)[no] = std::pair<void*, Deletor>(privacy, Delete_<Privacy>);
-
-  if (NULL!=first_create) *first_create=true;
-  return privacy;
-
-  ERROR_HANDLE:
-  if (NULL!=privacy) delete privacy;
-  return NULL;
-}
-
-template <typename Privacy>
-Privacy* ThreadPrivacy::Get(size_t no, bool* first_create) { 
+        size_t no,
+        Privacy *privacy_arg,
+        bool* first_create) {
   XFC_RAII_INIT(NULL)
 
   void* result=NULL;
+  Privacy* privacy = NULL;
   Privacies* privacies;
-  Privacy* privacy=NULL;
   int ret;
 
   ret = Get_<Privacy>(no, result, privacies);
@@ -114,8 +79,12 @@ Privacy* ThreadPrivacy::Get(size_t no, bool* first_create) {
     XFC_FAIL_HANDLE(true)
   }
 
-  privacy = new (std::nothrow) Privacy;
-  XFC_FAIL_HANDLE(NULL==privacy)
+  if (NULL==privacy_arg) {
+    privacy = new(std::nothrow) Privacy;
+    XFC_FAIL_HANDLE(NULL==privacy)
+  } else {
+    privacy = privacy_arg;
+  }
 
   if (no >= privacies->size()) {
     size_t old_size = privacies->size();
@@ -128,7 +97,7 @@ Privacy* ThreadPrivacy::Get(size_t no, bool* first_create) {
   return privacy;
 
   ERROR_HANDLE:
-  if (NULL!=privacy) delete privacy;
+  if (NULL==privacy_arg) delete privacy;
   return NULL;
 }
 

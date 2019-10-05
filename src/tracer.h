@@ -4,12 +4,13 @@
 #include "jsontype/jsontype.h"
 #include "str_helper.hpp"
 #include "time/time.h"
+#include "thread_privacy/thread_privacy.h"
 
 namespace xforce { 
 
-class ReqTracer {
+class Tracer {
  public: 
-  inline ReqTracer();
+  inline Tracer();
 
   inline void Set(const std::string &key, bool val);
   inline void Set(const std::string &key, int val);
@@ -23,59 +24,58 @@ class ReqTracer {
   inline void Clear();
   inline std::string GetReport() const;
 
-  virtual ~ReqTracer();
+  virtual ~Tracer();
 
-  inline static ReqTracer& Get() { return *reqTracer_; }
   static void Tini();
 
- private:
+ protected:
   time_t curMs_;
   xforce::JsonType *jsonType_;  
 
-  static ReqTracer *reqTracer_;
+  static ThreadPrivacy *threadPrivacy_;
 };
 
-ReqTracer::ReqTracer() {
+Tracer::Tracer() {
   jsonType_ = new xforce::JsonType();
 }
 
-void ReqTracer::Set(const std::string &key, bool val) {
+void Tracer::Set(const std::string &key, bool val) {
   (*jsonType_)[key] = val;
 }
 
-void ReqTracer::Set(const std::string &key, int val) {
+void Tracer::Set(const std::string &key, int val) {
   (*jsonType_)[key] = val;
 }
 
-void ReqTracer::Set(const std::string &key, const char *val) {
+void Tracer::Set(const std::string &key, const char *val) {
   (*jsonType_)[key] = val;
 }
 
-void ReqTracer::Set(const std::string &key, const std::string &val) {
+void Tracer::Set(const std::string &key, const std::string &val) {
   (*jsonType_)[key] = val;
 }
 
-void ReqTracer::Set(const std::string &key, const std::wstring &val) {
+void Tracer::Set(const std::string &key, const std::wstring &val) {
   std::shared_ptr<std::string> valStr = StrHelper::Wstr2Str(val);
   XFC_ASSERT(nullptr != valStr);
   Set(key, *valStr);
 }
 
-void ReqTracer::Add(const std::string &key, const std::string &val) {
+void Tracer::Add(const std::string &key, const std::string &val) {
   (*jsonType_)[key].Append(val);
 }
 
-void ReqTracer::Add(const std::string &key, const std::wstring &val) {
+void Tracer::Add(const std::string &key, const std::wstring &val) {
   std::shared_ptr<std::string> valStr = StrHelper::Wstr2Str(val);
   XFC_ASSERT(nullptr != valStr);
   Add(key, *valStr);
 }
 
-void ReqTracer::Clear() {
+void Tracer::Clear() {
   curMs_ = xforce::Time::GetCurrentMsec(true);
 }
 
-std::string ReqTracer::GetReport() const {
+std::string Tracer::GetReport() const {
   std::stringstream ostr;
   jsonType_->DumpJson(ostr);
   return ostr.str();
