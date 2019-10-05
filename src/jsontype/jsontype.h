@@ -122,6 +122,7 @@ class JsonType {
   inline void Append(const char* str_val);
   inline void Append(const std::string& str_val);
   inline void Append(const std::wstring& str_val);
+  inline void Append(const JsonType& json_val);
 
   inline bool operator==(bool bool_val);
   inline bool operator==(int int_val);
@@ -257,6 +258,15 @@ void JsonType::Append(const std::string& str_val) {
 
 void JsonType::Append(const std::wstring& str_val) {
   return Append(*(StrHelper::Wstr2Str(str_val)));
+}
+
+void JsonType::Append(const JsonType& json_val) {
+  if (JsonValType::kList != shared_json_val_->type) {
+    Reset_(JsonValType::kList);
+  }
+  Normalize_();
+
+  shared_json_val_->data.list_val->push_back(json_val);
 }
 
 bool JsonType::operator==(bool bool_val) {

@@ -17,9 +17,11 @@ class Tracer {
   inline void Set(const std::string &key, const char *val);
   inline void Set(const std::string &key, const std::string &val);
   inline void Set(const std::string &key, const std::wstring &val);
+  inline void Set(const std::string &key, const JsonType &val);
 
   inline void Add(const std::string &key, const std::string &val);
   inline void Add(const std::string &key, const std::wstring &val);
+  inline void Add(const std::string &key, const JsonType &val);
 
   inline void Clear();
   inline std::string GetReport() const;
@@ -30,13 +32,15 @@ class Tracer {
 
  protected:
   time_t curMs_;
-  xforce::JsonType *jsonType_;  
+  xforce::JsonType *jsonType_;
+  xforce::JsonType *tmpJsonType_;
 
   static ThreadPrivacy *threadPrivacy_;
 };
 
 Tracer::Tracer() {
   jsonType_ = new xforce::JsonType();
+  tmpJsonType_ = new xforce::JsonType();
 }
 
 void Tracer::Set(const std::string &key, bool val) {
@@ -59,14 +63,20 @@ void Tracer::Set(const std::string &key, const std::wstring &val) {
   (*jsonType_)[key] = val;
 }
 
+void Tracer::Set(const std::string &key, const JsonType &val) {
+  (*jsonType_)[key] = val;
+}
+
 void Tracer::Add(const std::string &key, const std::string &val) {
   (*jsonType_)[key].Append(val);
 }
 
 void Tracer::Add(const std::string &key, const std::wstring &val) {
-  std::shared_ptr<std::string> valStr = StrHelper::Wstr2Str(val);
-  XFC_ASSERT(nullptr != valStr);
-  Add(key, *valStr);
+  (*jsonType_)[key].Append(val);
+}
+
+void Tracer::Add(const std::string &key, const JsonType &val) {
+  (*jsonType_)[key].Append(val);
 }
 
 void Tracer::Clear() {

@@ -5,6 +5,7 @@ namespace xforce {
 ThreadPrivacy* Tracer::threadPrivacy_ = new ThreadPrivacy();
 
 Tracer::~Tracer() {
+  XFC_DELETE(tmpJsonType_m)
   XFC_DELETE(jsonType_)
 }
 
