@@ -56,9 +56,7 @@ void Tracer::Set(const std::string &key, const std::string &val) {
 }
 
 void Tracer::Set(const std::string &key, const std::wstring &val) {
-  std::shared_ptr<std::string> valStr = StrHelper::Wstr2Str(val);
-  XFC_ASSERT(nullptr != valStr);
-  Set(key, *valStr);
+  (*jsonType_)[key] = val;
 }
 
 void Tracer::Add(const std::string &key, const std::string &val) {
