@@ -33,14 +33,12 @@ class Tracer {
  protected:
   time_t curMs_;
   xforce::JsonType *jsonType_;
-  xforce::JsonType *tmpJsonType_;
 
   static ThreadPrivacy *threadPrivacy_;
 };
 
 Tracer::Tracer() {
   jsonType_ = new xforce::JsonType();
-  tmpJsonType_ = new xforce::JsonType();
 }
 
 void Tracer::Set(const std::string &key, bool val) {

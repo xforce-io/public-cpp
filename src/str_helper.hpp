@@ -36,11 +36,15 @@ class StrHelper {
     template <typename T>
     inline static bool GetNum(IN const char *str, OUT T& num);
 
+    inline static bool GetNum(const char* str, double& num);
+
     template <typename T>
     inline static bool GetNum(IN const std::wstring &str, OUT T& num);
 
     template <typename T>
-    inline static bool GetNum(IN const wchar_t *str, T& num);
+    inline static bool GetNum(IN const wchar_t *str, OUT T& num);
+
+    inline static bool GetNum(const wchar_t* str, double& num);
 
     template <typename T>
 	  inline static std::string GetStr(IN T num );
@@ -105,7 +109,7 @@ void StrHelper::SplitStr(
 }
 
 template <typename T>
-bool StrHelper::GetNum(IN const std::string &str, OUT T& num) {
+bool StrHelper::GetNum(const std::string &str, T& num) {
   return GetNum(str.c_str(), num);
 }
 
@@ -122,7 +126,6 @@ bool StrHelper::GetNum(const char* str, T& num) {
     return true;
 }
 
-template <>
 bool StrHelper::GetNum(const char* str, double& num) {
     char* endptr;
     num = strtod(str, &endptr);
@@ -135,7 +138,7 @@ bool StrHelper::GetNum(const char* str, double& num) {
 }
 
 template <typename T>
-bool StrHelper::GetNum(IN const std::wstring &str, OUT T& num) {
+bool StrHelper::GetNum(const std::wstring &str, T& num) {
   return GetNum(str.c_str(), num);
 }
 
@@ -152,7 +155,6 @@ bool StrHelper::GetNum(const wchar_t* str, T& num) {
     return true;
 }
 
-template <>
 bool StrHelper::GetNum(const wchar_t* str, double& num) {
     wchar_t* endptr;
     num = wcstod(str, &endptr);
@@ -253,9 +255,7 @@ void StrHelper::SplitStr(
 
         tmp_str = StrType();
         tmp_str.append(ptr_0, ptr_1-ptr_0);
-        if (!tmp_str.empty()) {
-          vals.push_back(tmp_str);
-        }
+        vals.push_back(tmp_str);
 
         if ('\0' == *ptr_1) break;
         ptr_0 = ++ptr_1;
