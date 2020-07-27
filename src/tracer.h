@@ -25,6 +25,7 @@ class Tracer {
 
   inline void Clear();
   inline std::string GetReport() const;
+  inline std::string GetReport(const std::string &key) const;
 
   virtual ~Tracer();
 
@@ -86,6 +87,12 @@ void Tracer::Clear() {
 std::string Tracer::GetReport() const {
   std::stringstream ostr;
   jsonType_->DumpJson(ostr);
+  return ostr.str();
+}
+
+std::string Tracer::GetReport(const std::string &key) const {
+  std::stringstream ostr;
+  (*jsonType_)[key].DumpJson(ostr);
   return ostr.str();
 }
 
