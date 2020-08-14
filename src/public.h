@@ -21,3 +21,4 @@
 #include "multi_array_helper.hpp"
 #include "simple_trie.h"
 #include "tracer.h"
+#include "httplib.h"

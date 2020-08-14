@@ -155,7 +155,7 @@ int IOHelper::ScanFiles(const std::string &inputDir, std::vector<std::string> &f
   struct dirent *dirent;
   while ((dirent = readdir(dir))) {
     std::string tmpFileName = dirent->d_name;
-    if("." == tmpFileName || ".." == tmpFileName) {
+    if(tmpFileName.empty() || '.' == tmpFileName[0]) {
       continue;
     } else {
       filepaths.push_back(inputDir + "/" + tmpFileName);
